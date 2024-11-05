@@ -109,7 +109,8 @@ void Buffer::RetrieveUntil(const char *end)
  */
 void Buffer::RetriveAll()
 {
-    bzero(&buffer_[0], buffer_.size());
+    // 缓冲区全部置零
+    memset(buffer_.data(), 0, buffer_.size());
     readPos_ = 0;
     writePos_ = 0;
 }
@@ -165,6 +166,7 @@ void Buffer::Append(const std::string &str)
 void Buffer::Append(const char *str, size_t len)
 {
     assert(str);
+    /* 确保有足够空间 */
     EnsureWriteable(len);
     std::copy(str, str + len, BeginWrite());
     HasWritten(len);
@@ -254,7 +256,7 @@ ssize_t Buffer::WriteFd(int fd, int *Errno)
  */
 char *Buffer::BeginPtr_()
 {
-    return &*buffer_.begin();
+    return buffer_.data();
 }
 
 /**
@@ -274,6 +276,7 @@ const char *Buffer::BeginPtr_() const
  */
 void Buffer::MakeSpace_(size_t len)
 {
+    // 如果可写区域+头部区域小于len, 则重新分配
     if (WritableBytes() + PrependableBytes() < len)
     {
         buffer_.resize(writePos_ + len + 1);
@@ -281,6 +284,7 @@ void Buffer::MakeSpace_(size_t len)
     else
     {
         size_t readable = ReadableBytes();
+        // 将可读数据移动到缓冲区头部
         std::copy(BeginPtr_() + readPos_, BeginPtr_() + writePos_, BeginPtr_());
         readPos_ = 0;
         writePos_ = readPos_ + readable;
