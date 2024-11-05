@@ -1,3 +1,13 @@
+/**
+ * @file log.h
+ * @author xiaqy (792155443@qq.com)
+ * @brief 日志系统声明
+ * @version 0.1
+ * @date 2024-11-05
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #if !defined(LOG_H)
 #define LOG_H
 

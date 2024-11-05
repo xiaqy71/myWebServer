@@ -1,5 +1,20 @@
+/**
+ * @file heaptimer.cpp
+ * @author xiaqy (792155443@qq.com)
+ * @brief 基于小根堆的定时器实现
+ * @version 0.1
+ * @date 2024-11-05
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include "heaptimer.h"
 
+/**
+ * @brief 删除指定index位置的节点
+ * 
+ * @param index 待删除节点的位置
+ */
 void HeapTimer::del_(size_t index)
 {
     assert(!heap_.empty() && index >= 0 && index < heap_.size());
@@ -16,6 +31,11 @@ void HeapTimer::del_(size_t index)
     heap_.pop_back();
 }
 
+/**
+ * @brief 向上调整堆
+ * 
+ * @param i 调整的节点位置
+ */
 void HeapTimer::siftup_(size_t i)
 {
     assert(i >=0 && i < heap_.size());
@@ -29,6 +49,14 @@ void HeapTimer::siftup_(size_t i)
     }
 }
 
+/**
+ * @brief 向下调整堆
+ * 
+ * @param index 待调整节点的位置
+ * @param n 堆的有效大小
+ * @return true 调整成功
+ * @return false 调整失败
+ */
 bool HeapTimer::siftdown_(size_t index, size_t n)
 {
     assert(index >= 0 && index < heap_.size());
@@ -45,6 +73,12 @@ bool HeapTimer::siftdown_(size_t index, size_t n)
     return i > index;
 }
 
+/**
+ * @brief 交换两个节点
+ * 
+ * @param i 
+ * @param j 
+ */
 void HeapTimer::SwapNode_(size_t i, size_t j)
 {
     assert(i >= 0 && i < heap_.size());
@@ -54,6 +88,12 @@ void HeapTimer::SwapNode_(size_t i, size_t j)
     ref_[heap_[j].id] = j;
 }
 
+/**
+ * @brief 调整指定id节点的超时时间
+ * 
+ * @param id 节点id
+ * @param newExpires 新的超时时间
+ */
 void HeapTimer::adjust(int id, int newExpires)
 {
     assert(!heap_.empty() && ref_.count(id) > 0);
@@ -61,6 +101,13 @@ void HeapTimer::adjust(int id, int newExpires)
     siftdown_(ref_[id], heap_.size());
 }
 
+/**
+ * @brief 添加新的超时节点
+ * 
+ * @param id 
+ * @param timeOut 
+ * @param cb 超时回调函数
+ */
 void HeapTimer::add(int id, int timeOut, const TimeOutCallBack &cb)
 {
     assert(id >= 0);
@@ -81,24 +128,36 @@ void HeapTimer::add(int id, int timeOut, const TimeOutCallBack &cb)
     }
 }
 
+/**
+ * @brief 删除指定id节点，并调用回调函数
+ * 
+ * @param id 待删除节点的id
+ */
 void HeapTimer::doWork(int id)
 {
-    /* 删除指定id节点， 并触发回调函数*/
     if (heap_.empty() || ref_.count(id) == 0) {
         return;
     }
     size_t i = ref_[id];
     TimerNode node = heap_[i];
-    node.cb;
+    node.cb();
     del_(i);
 }
 
+/**
+ * @brief 清空堆
+ * 
+ */
 void HeapTimer::clear()
 {
     ref_.clear();
     heap_.clear();
 }
 
+/**
+ * @brief 超时处理函数
+ * 
+ */
 void HeapTimer::tick()
 {
     if (heap_.empty()) {
@@ -114,12 +173,21 @@ void HeapTimer::tick()
     }
 }
 
+/**
+ * @brief 删除堆顶节点
+ * 
+ */
 void HeapTimer::pop()
 {
     assert(!heap_.empty());
     del_(0);
 }
 
+/**
+ * @brief 获取下一个超时节点的超时时间
+ * 
+ * @return int 应该设置的定时器超时时间
+ */
 int HeapTimer::GetNextTick()
 {
     tick();

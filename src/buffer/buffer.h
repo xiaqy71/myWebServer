@@ -1,3 +1,13 @@
+/**
+ * @file buffer.h
+ * @author xiaqy (792155443@qq.com)
+ * @brief 缓冲区声明
+ * @version 0.1
+ * @date 2024-11-05
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #if !defined(BUFFER_H)
 #define BUFFER_H
 

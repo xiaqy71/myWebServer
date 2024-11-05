@@ -1,3 +1,13 @@
+/**
+ * @file blockqueue.h
+ * @author xiaqy (792155443@qq.com)
+ * @brief 阻塞队列实现
+ * @version 0.1
+ * @date 2024-11-05
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #if !defined(BLOCKQUEUE_H)
 #define BLOCKQUEUE_H
 
@@ -54,6 +64,12 @@ private:
     std::condition_variable condProducer_;
 };
 
+/**
+ * @brief Construct a new Block Deque< T>:: Block Deque object
+ * 
+ * @tparam T 容纳的数据类型
+ * @param MaxCapcity 最大容量
+ */
 template <class T>
 inline BlockDeque<T>::BlockDeque(size_t MaxCapcity) : capacity_(MaxCapcity)
 {
@@ -61,12 +77,22 @@ inline BlockDeque<T>::BlockDeque(size_t MaxCapcity) : capacity_(MaxCapcity)
     isClose_ = false;
 }
 
+/**
+ * @brief Destroy the Block Deque< T>:: Block Deque object
+ * 
+ * @tparam T 
+ */
 template <class T>
 inline BlockDeque<T>::~BlockDeque()
 {
     Close();
 }
 
+/**
+ * @brief 清空队列
+ * 
+ * @tparam T 
+ */
 template <class T>
 inline void BlockDeque<T>::clear()
 {
@@ -74,6 +100,13 @@ inline void BlockDeque<T>::clear()
     deq_.clear();
 }
 
+/**
+ * @brief 判断队列是否为空
+ * 
+ * @tparam T 
+ * @return true 队列为空
+ * @return false 队列非空
+ */
 template <class T>
 inline bool BlockDeque<T>::empty()
 {
@@ -81,6 +114,13 @@ inline bool BlockDeque<T>::empty()
     return deq_.empty();
 }
 
+/**
+ * @brief 判断队列是否已满
+ * 
+ * @tparam T 
+ * @return true 队列已满
+ * @return false 队列未满
+ */
 template <class T>
 inline bool BlockDeque<T>::full()
 {
@@ -88,6 +128,11 @@ inline bool BlockDeque<T>::full()
     return deq_.size() >= capacity_;
 }
 
+/**
+ * @brief 关闭队列
+ * 
+ * @tparam T 
+ */
 template <class T>
 inline void BlockDeque<T>::Close()
 {
@@ -100,6 +145,12 @@ inline void BlockDeque<T>::Close()
     condConsumer_.notify_all();
 }
 
+/**
+ * @brief 获取队列大小
+ * 
+ * @tparam T 
+ * @return size_t 队列大小
+ */
 template <class T>
 inline size_t BlockDeque<T>::size()
 {
@@ -107,6 +158,12 @@ inline size_t BlockDeque<T>::size()
     return deq_.size();
 }
 
+/**
+ * @brief 获取队列容量
+ * 
+ * @tparam T 
+ * @return size_t 队列容量
+ */
 template <class T>
 inline size_t BlockDeque<T>::capacity()
 {
@@ -114,6 +171,12 @@ inline size_t BlockDeque<T>::capacity()
     return capacity_;
 }
 
+/**
+ * @brief 获取队首元素
+ * 
+ * @tparam T 
+ * @return T 队首元素
+ */
 template <class T>
 inline T BlockDeque<T>::front()
 {
@@ -121,6 +184,12 @@ inline T BlockDeque<T>::front()
     return deq_.front();
 }
 
+/**
+ * @brief 获取队尾元素
+ * 
+ * @tparam T 
+ * @return T 队尾元素
+ */
 template <class T>
 inline T BlockDeque<T>::back()
 {
@@ -128,6 +197,12 @@ inline T BlockDeque<T>::back()
     return deq_.back();
 }
 
+/**
+ * @brief 追加元素到队尾
+ * 
+ * @tparam T 
+ * @param item 待追加的元素
+ */
 template <class T>
 inline void BlockDeque<T>::push_back(const T &item)
 {
@@ -139,6 +214,12 @@ inline void BlockDeque<T>::push_back(const T &item)
     condConsumer_.notify_one();
 }
 
+/**
+ * @brief 追加元素到队首
+ * 
+ * @tparam T 
+ * @param item 待追加的元素
+ */
 template <class T>
 inline void BlockDeque<T>::push_front(const T &item)
 {
@@ -150,6 +231,14 @@ inline void BlockDeque<T>::push_front(const T &item)
     condConsumer_.notify_one();
 }
 
+/**
+ * @brief 弹出队首元素，阻塞等待
+ * 
+ * @tparam T 
+ * @param item 
+ * @return true 
+ * @return false 
+ */
 template <class T>
 inline bool BlockDeque<T>::pop(T &item)
 {
@@ -166,6 +255,15 @@ inline bool BlockDeque<T>::pop(T &item)
     return true;
 }
 
+/**
+ * @brief 弹出队首元素，超时返回
+ * 
+ * @tparam T 
+ * @param item 
+ * @param timeout 超时时间
+ * @return true 
+ * @return false 
+ */
 template <class T>
 inline bool BlockDeque<T>::pop(T &item, int timeout)
 {
@@ -184,6 +282,11 @@ inline bool BlockDeque<T>::pop(T &item, int timeout)
     return true;
 }
 
+/**
+ * @brief 刷新队列
+ * 
+ * @tparam T 
+ */
 template <class T>
 inline void BlockDeque<T>::flush()
 {

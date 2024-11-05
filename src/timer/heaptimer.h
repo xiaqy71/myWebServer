@@ -1,3 +1,13 @@
+/**
+ * @file heaptimer.h
+ * @author xiaqy (792155443@qq.com)
+ * @brief 基于小根堆的定时器声明
+ * @version 0.1
+ * @date 2024-11-05
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #if !defined(HEAP_TIMER_H)
 #define HEAP_TIMER_H
 

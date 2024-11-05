@@ -1,5 +1,23 @@
+/**
+ * @file log.cpp
+ * @author xiaqy (792155443@qq.com)
+ * @brief 简易日志系统实现
+ * @version 0.1
+ * @date 2024-11-05
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include "log.h"
 
+/**
+ * @brief 初始化日志系统
+ * 
+ * @param level 日志等级
+ * @param path 日志路径
+ * @param suffix 日志后缀
+ * @param maxQueueCapacity 队列容量
+ */
 void Log::init(int level, const char *path, const char *suffix, int maxQueueCapacity)
 {
     isOpen_ = true;
@@ -42,17 +60,33 @@ void Log::init(int level, const char *path, const char *suffix, int maxQueueCapa
     }
 }
 
+/**
+ * @brief 获取日志单例
+ * 
+ * @return Log* 
+ */
 Log *Log::Instance()
 {
     static Log inst;
     return &inst;
 }
 
+/**
+ * @brief 刷新日志线程
+ * 
+ */
 void Log::FlushLogThread()
 {
     Log::Instance()->AsyncWrite_();
 }
 
+/**
+ * @brief 写入日志的主要函数
+ * 
+ * @param level 日志等级
+ * @param format 日志格式
+ * @param ... 可变参数
+ */
 void Log::write(int level, const char *format, ...)
 {
     struct timeval now = {0, 0};
@@ -112,6 +146,10 @@ void Log::write(int level, const char *format, ...)
     }
 }
 
+/**
+ * @brief 刷新日志
+ * 
+ */
 void Log::flush()
 {
     if (isAsync_) {
@@ -120,18 +158,32 @@ void Log::flush()
     fflush(fp_);
 }
 
+/**
+ * @brief 获取日志等级
+ * 
+ * @return int 日志等级
+ */
 int Log::GetLevel()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return level_;
 }
 
+/**
+ * @brief 设置日志等级
+ * 
+ * @param level 日志等级
+ */
 void Log::SetLevel(int level)
 {
     std::lock_guard<std::mutex> locker(mtx_);
     level_ = level;
 }
 
+/**
+ * @brief Construct a new Log:: Log object
+ * 
+ */
 Log::Log()
 {
     lineCount_ = 0;
@@ -142,6 +194,11 @@ Log::Log()
     fp_ = nullptr;
 }
 
+/**
+ * @brief 向日志添加头部，如[debug]:
+ * 
+ * @param level 日志等级
+ */
 void Log::AppendLogLevelTitle_(int level)
 {
     switch (level)
@@ -164,6 +221,10 @@ void Log::AppendLogLevelTitle_(int level)
     }
 }
 
+/**
+ * @brief Destroy the Log:: Log object
+ * 
+ */
 Log::~Log()
 {
     if (writeThread_ && writeThread_->joinable()) {
@@ -181,6 +242,10 @@ Log::~Log()
     }
 }
 
+/**
+ * @brief 异步写入日志
+ * 
+ */
 void Log::AsyncWrite_()
 {
     std::string str = "";

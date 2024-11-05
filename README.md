@@ -2,7 +2,7 @@
 
 ## 前言
 
-本项目基于[WebServer](https://github.com/markparticle/WebServer)，在此项目做了些许改动与优化
+本项目基于[WebServer](https://github.com/markparticle/WebServer)，在此项目做了些许改动与优化，并添加了注释
 
 ## 改进
 
