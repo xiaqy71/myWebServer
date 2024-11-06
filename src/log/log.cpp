@@ -18,7 +18,7 @@
  * @param suffix 日志后缀
  * @param maxQueueCapacity 队列容量
  */
-void Log::init(int level, const char *path, const char *suffix, int maxQueueCapacity)
+void Log::init(LogLevel level, const char *path, const char *suffix, int maxQueueCapacity)
 {
     isOpen_ = true;
     level_ = level;
@@ -70,19 +70,25 @@ void Log::init(int level, const char *path, const char *suffix, int maxQueueCapa
     }
 }
 
-/**
- * @brief 获取日志单例
- *
- * @return Log*
- */
 Log *Log::Instance()
 {
-    static std::once_flag initInstanceFlag;
-    static Log *inst = nullptr;
-    std::call_once(initInstanceFlag, []()
-                   { inst = new Log(); });
-    return inst;
+    static Log inst;
+    return &inst;
 }
+
+// /**
+//  * @brief 获取日志单例
+//  *
+//  * @return Log*
+//  */
+// Log *Log::Instance()
+// {
+//     static std::once_flag initInstanceFlag;
+//     static Log *inst = nullptr;
+//     std::call_once(initInstanceFlag, []()
+//                    { inst = new Log(); });
+//     return inst;
+// }
 
 /**
  * @brief 刷新日志线程
@@ -100,7 +106,7 @@ void Log::FlushLogThread()
  * @param format 日志格式
  * @param ... 可变参数
  */
-void Log::write(int level, const char *format, ...)
+void Log::write(LogLevel level, const char *format, ...)
 {
     struct timeval now = {0, 0};
     gettimeofday(&now, nullptr);
@@ -184,7 +190,7 @@ void Log::flush()
  *
  * @return int 日志等级
  */
-int Log::GetLevel()
+LogLevel Log::GetLevel()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return level_;
@@ -195,7 +201,7 @@ int Log::GetLevel()
  *
  * @param level 日志等级
  */
-void Log::SetLevel(int level)
+void Log::SetLevel(LogLevel level)
 {
     std::lock_guard<std::mutex> locker(mtx_);
     level_ = level;
@@ -220,20 +226,20 @@ Log::Log()
  *
  * @param level 日志等级
  */
-void Log::AppendLogLevelTitle_(int level)
+void Log::AppendLogLevelTitle_(LogLevel level)
 {
     switch (level)
     {
-    case 0:
+    case LogLevel::DEBUG:
         buff_.Append("[debug]: ", 9);
         break;
-    case 1:
+    case LogLevel::INFO:
         buff_.Append("[info]: ", 8);
         break;
-    case 2:
+    case LogLevel::WARN:
         buff_.Append("[warn]: ", 8);
         break;
-    case 3:
+    case LogLevel::ERROR:
         buff_.Append("[error]: ", 9);
         break;
     default:

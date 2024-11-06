@@ -22,26 +22,34 @@
 #include "blockqueue.h"
 #include "../buffer/buffer.h"
 
+enum class LogLevel
+{
+    DEBUG = 0,
+    INFO = 1,
+    WARN = 2,
+    ERROR = 3
+};
+
 class Log
 {
 public:
-    void init(int level, const char *path = "./log",
+    void init(LogLevel level, const char *path = "./log",
               const char *suffix = ".log",
               int maxQueueCapacity = 1024);
     static Log *Instance();
     static void FlushLogThread();
 
-    void write(int level, const char *format, ...);
+    void write(LogLevel level, const char *format, ...);
     void flush();
 
-    int GetLevel();
-    void SetLevel(int level);
+    LogLevel GetLevel();
+    void SetLevel(LogLevel level);
     bool IsOpen() { return isOpen_; }
 
 private:
     Log();
-    void AppendLogLevelTitle_(int level);
     virtual ~Log();
+    void AppendLogLevelTitle_(LogLevel level);
     void AsyncWrite_();
 
 private:
@@ -59,9 +67,9 @@ private:
 
     bool isOpen_; // 是否打开日志
 
-    Buffer buff_;  // 缓冲区
-    int level_;    // 日志等级
-    bool isAsync_; // 是否异步
+    Buffer buff_;    // 缓冲区
+    LogLevel level_; // 日志等级
+    bool isAsync_;   // 是否异步
 
     FILE *fp_;
     std::unique_ptr<BlockDeque<std::string>> deque_; // 队列存放待写入的日志
@@ -72,7 +80,7 @@ private:
 #define LOG_BASE(level, format, ...)                   \
     do                                                 \
     {                                                  \
-        Log *log = Log::Instance();                    \
+        auto log = Log::Instance();                    \
         if (log->IsOpen() && log->GetLevel() <= level) \
         {                                              \
             log->write(level, format, ##__VA_ARGS__);  \
@@ -80,25 +88,25 @@ private:
         }                                              \
     } while (0);
 
-#define LOG_DEBUG(format, ...)             \
-    do                                     \
-    {                                      \
-        LOG_BASE(0, format, ##__VA_ARGS__) \
+#define LOG_DEBUG(format, ...)                           \
+    do                                                   \
+    {                                                    \
+        LOG_BASE(LogLevel::DEBUG, format, ##__VA_ARGS__) \
     } while (0);
-#define LOG_INFO(format, ...)              \
-    do                                     \
-    {                                      \
-        LOG_BASE(1, format, ##__VA_ARGS__) \
+#define LOG_INFO(format, ...)                           \
+    do                                                  \
+    {                                                   \
+        LOG_BASE(LogLevel::INFO, format, ##__VA_ARGS__) \
     } while (0);
-#define LOG_WARN(format, ...)              \
-    do                                     \
-    {                                      \
-        LOG_BASE(2, format, ##__VA_ARGS__) \
+#define LOG_WARN(format, ...)                           \
+    do                                                  \
+    {                                                   \
+        LOG_BASE(LogLevel::WARN, format, ##__VA_ARGS__) \
     } while (0);
-#define LOG_ERROR(format, ...)             \
-    do                                     \
-    {                                      \
-        LOG_BASE(3, format, ##__VA_ARGS__) \
+#define LOG_ERROR(format, ...)                           \
+    do                                                   \
+    {                                                    \
+        LOG_BASE(LogLevel::ERROR, format, ##__VA_ARGS__) \
     } while (0);
 
 #endif // LOG_H

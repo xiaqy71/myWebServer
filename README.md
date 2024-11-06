@@ -6,7 +6,7 @@
 
 ## 改进
 
-1. 依据《Effective C++》中的准则，将公共逻辑抽取到一个私有函数中，从而重用代码并减少重复。
+- 依据《Effective C++》中的准则，将公共逻辑抽取到一个私有函数中，从而重用代码并减少重复。
 
 ```cpp
 const char *Buffer::BeginWriteConst() const
@@ -20,7 +20,7 @@ char *Buffer::BeginWrite()
 }
 ```
 
-2. 使用现代C++优化部分代码
+- 使用现代C++优化部分代码
 
 例如，原代码
 
@@ -39,19 +39,24 @@ deque_ = std::make_unique<BlockDeque<std::string>>();
 writeThread_ = std::make_unique<std::thread>(FlushLogThread);
 ```
 
-使用 `std::call_once`确保 `Log`实例只被创建一次，并且是线程安全的
+- 使用GoogleTest对代码进行测试
 
-```cpp
-Log *Log::Instance()
-{
-    static Log *inst = nullptr;
-    std::call_once(initInstanceFlag_, []() {
-        inst = new Log();
-    });
-    return inst;
-}
+```cmake
+# 测试
+cmake_policy(SET CMP0135 NEW)
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+include(GoogleTest)
 ```
 
 ## 待解决
 
-1. 日志系统可以设置最大行数，超过最大行数时会创建新文件。如果某天已经写了两个文件，重新启动服务器程序时会在第一个日志文件后追加内容
+- 日志系统可以设置最大行数，超过最大行数时会创建新文件。如果某天已经写了两个文件，重新启动服务器程序时会在第一个日志文件后追加内容
