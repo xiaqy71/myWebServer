@@ -4,6 +4,12 @@
 
 本项目基于[WebServer](https://github.com/markparticle/WebServer)，在此项目做了些许改动与优化，并添加了注释
 
+## 如何运行本项目
+
+### 依赖
+
+mysql
+
 ## 改进
 
 - 依据《Effective C++》中的准则，将公共逻辑抽取到一个私有函数中，从而重用代码并减少重复。
@@ -56,6 +62,8 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 include(GoogleTest)
 ```
+
+- 使用configMgr类，读取配置，通过配置文件修改程序配置，避免每次修改配置都需要重新编译的麻烦
 
 ## 待解决
 

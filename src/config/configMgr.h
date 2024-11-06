@@ -1,3 +1,13 @@
+/**
+ * @file configMgr.h
+ * @author xiaqy (792155443@qq.com)
+ * @brief 配置管理类声明
+ * @version 0.1
+ * @date 2024-11-06
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #if !defined(CONFIGMGR_H)
 #define CONFIGMGR_H
 

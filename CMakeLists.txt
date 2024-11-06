@@ -10,17 +10,22 @@ set(TIMER_DIR ${SRC_DIR}/timer)
 set(BUFFER_DIR ${SRC_DIR}/buffer)
 set(LOG_DIR ${SRC_DIR}/log)
 set(CONFIG_DIR ${SRC_DIR}/config)
+set(POOL_DIR ${SRC_DIR}/pool)
 
 set(SOURCES
     ${SRC_DIR}/main.cpp
     ${TIMER_DIR}/heaptimer.cpp
     ${BUFFER_DIR}/buffer.cpp
     ${LOG_DIR}/log.cpp
+    ${CONFIG_DIR}/configMgr.cpp
+    ${POOL_DIR}/sqlconnpool.cpp
 )
 
-include_directories(${TIMER_DIR} ${BUFFER_DIR} ${LOG_DIR} ${CONFIG_DIR})
-
+include_directories(${TIMER_DIR} ${BUFFER_DIR} ${LOG_DIR} ${CONFIG_DIR} ${POOL_DIR} /usr/include/mysql)
+link_directories(/usr/lib64/mysql)
 add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} mysqlclient)
+
 # 拷贝 config.ini 文件到构建目录，存在则覆盖
 configure_file(${CMAKE_SOURCE_DIR}/config.ini ${CMAKE_BINARY_DIR}/config.ini COPYONLY)
 
