@@ -8,7 +8,21 @@
 
 ### 依赖
 
-mysql
+- cmake 3.20版本及以上
+- mysql
+
+使用以下命令获取MySQL C API的包含目录和库目录
+
+```bash
+mysql_config --cflags
+mysql_config --libs
+```
+
+修改项目根目录下 `CMakeLists.txt`中的链接库目录
+
+```cmake
+link_directories(/usr/lib64/mysql)
+```
 
 ## 改进
 
@@ -64,6 +78,7 @@ include(GoogleTest)
 ```
 
 - 使用configMgr类，读取配置，通过配置文件修改程序配置，避免每次修改配置都需要重新编译的麻烦
+- 增强封装性，将 SqlConnPool类中获取MySQL连接和还回MySQL连接的方法设为私有，将 `SqlConnRAII`设为其友元类，只允许通过RAII思想使用sql连接，避免内存泄露
 
 ## 待解决
 

@@ -36,11 +36,10 @@ private:
 };
 
 class SqlConnPool {
+    friend class SqlConnRAII;
 public:
     static SqlConnPool &Instance();
 
-    MYSQL* GetConn();
-    void returnConn(MYSQL* conn);
     int GetFreeConnCount();
 
     void Init(const char* host, int port,
@@ -50,6 +49,9 @@ public:
 private:
     SqlConnPool();
     ~SqlConnPool();
+
+    MYSQL* GetConn();
+    void returnConn(MYSQL* conn);
 
     int MAX_CONN_;
     int useCount_;
