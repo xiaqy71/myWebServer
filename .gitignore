@@ -1,3 +1,5 @@
 build/
 .clang-format
 format.sh
+.DS_Store
+._.DS_Store

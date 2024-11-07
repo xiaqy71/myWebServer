@@ -40,6 +40,10 @@ void HeapTimer::del_(size_t index)
  */
 void HeapTimer::siftup_(size_t i)
 {
+    if (i == 0)
+    {
+        return;
+    }
     assert(i >= 0 && i < heap_.size());
     size_t j = (i - 1) / 2;
 
@@ -125,6 +129,7 @@ void HeapTimer::add(int id, int timeOut, const TimeOutCallBack &cb)
     {
         // 新节点：堆尾插入， 调整堆
         i = heap_.size();
+        ref_[id] = i;
         heap_.push_back({id, Clock::now() + MS(timeOut), cb});
         siftup_(i);
     }

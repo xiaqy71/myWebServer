@@ -8,5 +8,39 @@
  * @copyright Copyright (c) 2024
  *
  */
+#include <tuple>
+#include "configMgr.h"
+#include "webserver.h"
 
-int main(int argc, char const *argv[]) { return 0; }
+int main(int argc, char const *argv[])
+{
+    auto [port,
+          trigMode,
+          timeoutMS,
+          OptLinger,
+          sqlPort,
+          sqlUser,
+          sqlPwd,
+          dbName,
+          connPoolNum,
+          threadNum,
+          openLog,
+          logLevel,
+          logQueSize] = WebServer::getServerConfig();
+
+    WebServer server(port,
+                     trigMode,
+                     timeoutMS,
+                     OptLinger,
+                     sqlPort,
+                     sqlUser,
+                     sqlPwd,
+                     dbName,
+                     connPoolNum,
+                     threadNum,
+                     openLog,
+                     logLevel,
+                     logQueSize);
+    server.Start();
+    return 0;
+}
