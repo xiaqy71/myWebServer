@@ -35,7 +35,9 @@ target_link_libraries(${PROJECT_NAME} mysqlclient)
 
 # 拷贝 config.ini 文件到构建目录，存在则覆盖
 configure_file(${CMAKE_SOURCE_DIR}/config.ini ${CMAKE_BINARY_DIR}/config.ini COPYONLY)
+# 拷贝 resources 文件夹到构建目录
 file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})
+
 # 测试
 cmake_policy(SET CMP0135 NEW)
 include(FetchContent)
