@@ -98,17 +98,10 @@ ctest
 
 - **单元测试框架**：使用 GoogleTest 进行代码测试，测试配置示例如下：
     ```cmake
-    cmake_policy(SET CMP0135 NEW)
-    include(FetchContent)
-    FetchContent_Declare(
-      googletest
-      URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-    )
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-
-    enable_testing()
-    include(GoogleTest)
+    # test gtest
+    add_executable(hello_test test/hello_test.cpp)
+    target_link_libraries(hello_test GTest::gtest_main)
+    gtest_discover_tests(hello_test)
     ```
 
 - **增强封装性**：`SqlConnPool` 类中获取和还回 MySQL 连接的方法设为私有，并将 `SqlConnRAII` 设为其友元类，利用 RAII 原则管理连接，防止内存泄漏。
