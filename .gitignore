@@ -1,5 +1,4 @@
 build/*
-!build/Makefile
 .clang-format
 format.sh
 .DS_Store
