@@ -48,9 +48,14 @@ WebServer::WebServer(int port,
 , epoller_(new Epoller())
 , threadpool_(new ThreadPool(threadNum))
 {
-    srcDir_ = getcwd(nullptr, 256);
-    assert(srcDir_);
-    strncat(srcDir_, "/resources/", 16);
+    char exePath[256] = {0};
+    ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    exePath[len] = '\0';
+    auto dirPath =
+        std::string(exePath).substr(0, std::string(exePath).find_last_of('/')) +
+        "/resources/";
+    srcDir_ = new char[dirPath.size() + 1];
+    memcpy(srcDir_, dirPath.c_str(), dirPath.size() + 1);
     HttpConn::userCount = 0;
     HttpConn::srcDir = srcDir_;
     SqlConnPool::Instance()->Init(
@@ -64,7 +69,13 @@ WebServer::WebServer(int port,
 
     if (openLog)
     {
-        Log::Instance()->init(logLevel, "./log", ".log", logQueSize);
+        char exePath[256] = {0};
+        ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+        exePath[len] = '\0';
+        auto dirPath = std::string(exePath).substr(
+            0, std::string(exePath).find_last_of('/'));
+        Log::Instance()->init(
+            logLevel, (dirPath + "/log").c_str(), ".log", logQueSize);
         if (isClose_)
         {
             LOG_ERROR("========== Server init error ==========");
@@ -94,7 +105,7 @@ WebServer::~WebServer()
 {
     close(listenFd_);
     isClose_ = true;
-    free(srcDir_);
+    delete[] srcDir_;
     SqlConnPool::Instance()->ClosePool();
 }
 

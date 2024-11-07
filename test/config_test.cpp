@@ -10,6 +10,6 @@ TEST(CONFIG_TEST, read_config) {
     bool ret = configMgr::Instance().init("config.ini");
     EXPECT_EQ(ret, true);
     auto& cfg = configMgr::Instance();
-    std::string host = static_cast<const char*>(cfg["mysql"]["host"]);
-    EXPECT_EQ(host, "127.0.0.1");
+    std::string host = static_cast<const char*>(cfg["mysql"]["port"]);
+    EXPECT_EQ(host, "3306");
 }

@@ -8,12 +8,15 @@
  * @copyright Copyright (c) 2024
  *
  */
-#include <tuple>
-#include "configMgr.h"
+#include <unistd.h>
 #include "webserver.h"
 
 int main(int argc, char const *argv[])
 {
+    /* 守护进程 后台运行 */
+    //daemon(1, 0);
+
+    /* 读取配置文件 */
     auto [port,
           trigMode,
           timeoutMS,

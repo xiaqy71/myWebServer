@@ -24,6 +24,50 @@ mysql_config --libs
 link_directories(/usr/lib64/mysql)
 ```
 
+MySQL配置方法，见[WebServer](https://github.com/markparticle/WebServer)
+
+### 运行
+
+```bash
+git clone https://github.com/xiaqy71/myWebServer.git
+cd myWebServer
+cd build
+cmake ..
+make
+./Server
+```
+
+> [!TIP]
+> 运行前需要修改config.ini中的配置(修改build目录中的config.ini无需重新构建，修改源码中的config.ini则需要重新构建)
+
+config.ini示例配置如下
+
+```ini
+[server]
+port = 8080
+trigMode = 3
+timeoutMS = 60000
+OptLinger =  false # true or false
+threadNum = 6
+[mysql]
+port = 3306
+user = xiaqy
+password = 123456
+database = WebServer
+connPoolNum = 12
+[log]
+open = true # true or false
+LogLevel = DEBUG # DEBUG or WARN or INFO 
+logQueueSize = 1024
+```
+
+### 测试
+
+```bash
+cd build
+ctest
+```
+
 ## 改进
 
 - 依据《Effective C++》中的准则，将公共逻辑抽取到一个私有函数中，从而重用代码并减少重复。
@@ -79,6 +123,27 @@ include(GoogleTest)
 
 - 使用configMgr类，读取配置，通过配置文件修改程序配置，避免每次修改配置都需要重新编译的麻烦
 - 增强封装性，将 SqlConnPool类中获取MySQL连接和还回MySQL连接的方法设为私有，将 `SqlConnRAII`设为其友元类，只允许通过RAII思想使用sql连接，避免内存泄露
+- 原代码根据执行目录获取资源目录，这样执行命令只能在固定目录进行，改为获取程序所在目录，因此只要将资源目录和程序放在同一目录，无论在哪里执行程序，都可以正常获取资源文件。
+
+原代码如下
+
+```cpp
+srcDir_ = getcwd(nullptr, 256);
+assert(srcDir_);
+strncat(srcDir_, "/resources/", 16);
+```
+
+修改后代码如下
+
+```cpp
+char exePath[256] = {0};
+ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+exePath[len] = '\0';
+auto dirPath =
+    std::string(exePath).substr(0, std::string(exePath).find_last_of('/')) + "/resources/";
+srcDir_ = new char[dirPath.size() + 1];
+memcpy(srcDir_, dirPath.c_str(), dirPath.size() + 1);
+```
 
 ## 待解决
 
