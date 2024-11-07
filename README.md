@@ -42,7 +42,7 @@ myWebServer 是基于 [WebServer](https://github.com/markparticle/WebServer) 项
     ./Server
     ```
 
-> [!TIPS]
+> [!TIP]
 > 在运行服务器之前，需先修改 `config.ini` 文件中的配置。如果修改的是 `build` 目录下的 `config.ini`，无需重新构建；若修改源码中的 `config.ini`，则需要重新构建项目。
 
 ### 示例配置 (`config.ini`)
