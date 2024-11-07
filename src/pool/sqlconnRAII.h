@@ -1,12 +1,12 @@
 /**
  * @file sqlconnRAII.h
  * @author xiaqy (792155443@qq.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2024-11-06
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #if !defined(SQLCONNRAII_H)
 #define SQLCONNRAII_H
@@ -16,7 +16,7 @@
 class SqlConnRAII
 {
 public:
-    SqlConnRAII(MYSQL** sql, SqlConnPool *connPool)
+    SqlConnRAII(MYSQL **sql, SqlConnPool *connPool)
     {
         *sql = connPool->GetConn();
         sql_ = *sql;
@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    MYSQL* sql_;
+    MYSQL *sql_;
     SqlConnPool *connPool_;
 };
 

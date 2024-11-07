@@ -4,9 +4,9 @@
  * @brief 阻塞队列实现
  * @version 0.1
  * @date 2024-11-05
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #if !defined(BLOCKQUEUE_H)
 #define BLOCKQUEUE_H
@@ -17,8 +17,8 @@
 #include <sys/time.h>
 #include <assert.h>
 
-template<class T>
-class BlockDeque {
+template <class T> class BlockDeque
+{
 public:
     explicit BlockDeque(size_t MaxCapcity = 1000);
 
@@ -66,12 +66,13 @@ private:
 
 /**
  * @brief Construct a new Block Deque< T>:: Block Deque object
- * 
+ *
  * @tparam T 容纳的数据类型
  * @param MaxCapcity 最大容量
  */
 template <class T>
-inline BlockDeque<T>::BlockDeque(size_t MaxCapcity) : capacity_(MaxCapcity)
+inline BlockDeque<T>::BlockDeque(size_t MaxCapcity)
+: capacity_(MaxCapcity)
 {
     assert(MaxCapcity > 0);
     isClose_ = false;
@@ -79,22 +80,17 @@ inline BlockDeque<T>::BlockDeque(size_t MaxCapcity) : capacity_(MaxCapcity)
 
 /**
  * @brief Destroy the Block Deque< T>:: Block Deque object
- * 
- * @tparam T 
+ *
+ * @tparam T
  */
-template <class T>
-inline BlockDeque<T>::~BlockDeque()
-{
-    Close();
-}
+template <class T> inline BlockDeque<T>::~BlockDeque() { Close(); }
 
 /**
  * @brief 清空队列
- * 
- * @tparam T 
+ *
+ * @tparam T
  */
-template <class T>
-inline void BlockDeque<T>::clear()
+template <class T> inline void BlockDeque<T>::clear()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     deq_.clear();
@@ -102,13 +98,12 @@ inline void BlockDeque<T>::clear()
 
 /**
  * @brief 判断队列是否为空
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @return true 队列为空
  * @return false 队列非空
  */
-template <class T>
-inline bool BlockDeque<T>::empty()
+template <class T> inline bool BlockDeque<T>::empty()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return deq_.empty();
@@ -116,13 +111,12 @@ inline bool BlockDeque<T>::empty()
 
 /**
  * @brief 判断队列是否已满
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @return true 队列已满
  * @return false 队列未满
  */
-template <class T>
-inline bool BlockDeque<T>::full()
+template <class T> inline bool BlockDeque<T>::full()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return deq_.size() >= capacity_;
@@ -130,11 +124,10 @@ inline bool BlockDeque<T>::full()
 
 /**
  * @brief 关闭队列
- * 
- * @tparam T 
+ *
+ * @tparam T
  */
-template <class T>
-inline void BlockDeque<T>::Close()
+template <class T> inline void BlockDeque<T>::Close()
 {
     {
         std::lock_guard<std::mutex> locker(mtx_);
@@ -147,12 +140,11 @@ inline void BlockDeque<T>::Close()
 
 /**
  * @brief 获取队列大小
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @return size_t 队列大小
  */
-template <class T>
-inline size_t BlockDeque<T>::size()
+template <class T> inline size_t BlockDeque<T>::size()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return deq_.size();
@@ -160,12 +152,11 @@ inline size_t BlockDeque<T>::size()
 
 /**
  * @brief 获取队列容量
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @return size_t 队列容量
  */
-template <class T>
-inline size_t BlockDeque<T>::capacity()
+template <class T> inline size_t BlockDeque<T>::capacity()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return capacity_;
@@ -173,12 +164,11 @@ inline size_t BlockDeque<T>::capacity()
 
 /**
  * @brief 获取队首元素
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @return T 队首元素
  */
-template <class T>
-inline T BlockDeque<T>::front()
+template <class T> inline T BlockDeque<T>::front()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return deq_.front();
@@ -186,12 +176,11 @@ inline T BlockDeque<T>::front()
 
 /**
  * @brief 获取队尾元素
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @return T 队尾元素
  */
-template <class T>
-inline T BlockDeque<T>::back()
+template <class T> inline T BlockDeque<T>::back()
 {
     std::lock_guard<std::mutex> locker(mtx_);
     return deq_.back();
@@ -199,15 +188,15 @@ inline T BlockDeque<T>::back()
 
 /**
  * @brief 追加元素到队尾
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @param item 待追加的元素
  */
-template <class T>
-inline void BlockDeque<T>::push_back(const T &item)
+template <class T> inline void BlockDeque<T>::push_back(const T &item)
 {
     std::unique_lock<std::mutex> locker(mtx_);
-    while (deq_.size() >= capacity_) {
+    while (deq_.size() >= capacity_)
+    {
         condProducer_.wait(locker);
     }
     deq_.push_back(item);
@@ -216,15 +205,15 @@ inline void BlockDeque<T>::push_back(const T &item)
 
 /**
  * @brief 追加元素到队首
- * 
- * @tparam T 
+ *
+ * @tparam T
  * @param item 待追加的元素
  */
-template <class T>
-inline void BlockDeque<T>::push_front(const T &item)
+template <class T> inline void BlockDeque<T>::push_front(const T &item)
 {
     std::unique_lock<std::mutex> locker(mtx_);
-    while (deq_.size() >= capacity_) {
+    while (deq_.size() >= capacity_)
+    {
         condProducer_.wait(locker);
     }
     deq_.push_front(item);
@@ -233,19 +222,20 @@ inline void BlockDeque<T>::push_front(const T &item)
 
 /**
  * @brief 弹出队首元素，阻塞等待
- * 
- * @tparam T 
- * @param item 
- * @return true 
- * @return false 
+ *
+ * @tparam T
+ * @param item
+ * @return true
+ * @return false
  */
-template <class T>
-inline bool BlockDeque<T>::pop(T &item)
+template <class T> inline bool BlockDeque<T>::pop(T &item)
 {
     std::unique_lock<std::mutex> locker(mtx_);
-    while (deq_.empty()) {
+    while (deq_.empty())
+    {
         condConsumer_.wait(locker);
-        if (isClose_) {
+        if (isClose_)
+        {
             return false;
         }
     }
@@ -257,22 +247,25 @@ inline bool BlockDeque<T>::pop(T &item)
 
 /**
  * @brief 弹出队首元素，超时返回
- * 
- * @tparam T 
- * @param item 
+ *
+ * @tparam T
+ * @param item
  * @param timeout 超时时间
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
-template <class T>
-inline bool BlockDeque<T>::pop(T &item, int timeout)
+template <class T> inline bool BlockDeque<T>::pop(T &item, int timeout)
 {
     std::unique_lock<std::mutex> locker(mtx_);
-    while (deq_.empty()) {
-        if (condConsumer_.wait_for(locker, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
+    while (deq_.empty())
+    {
+        if (condConsumer_.wait_for(locker, std::chrono::seconds(timeout)) ==
+            std::cv_status::timeout)
+        {
             return false;
         }
-        if (isClose_) {
+        if (isClose_)
+        {
             return false;
         }
     }
@@ -284,14 +277,12 @@ inline bool BlockDeque<T>::pop(T &item, int timeout)
 
 /**
  * @brief 刷新队列
- * 
- * @tparam T 
+ *
+ * @tparam T
  */
-template <class T>
-inline void BlockDeque<T>::flush()
+template <class T> inline void BlockDeque<T>::flush()
 {
     condConsumer_.notify_one();
 }
-
 
 #endif // BLOCKQUEUE_H

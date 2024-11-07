@@ -18,7 +18,10 @@
  * @param suffix 日志后缀
  * @param maxQueueCapacity 队列容量
  */
-void Log::init(LogLevel level, const char *path, const char *suffix, int maxQueueCapacity)
+void Log::init(LogLevel level,
+               const char *path,
+               const char *suffix,
+               int maxQueueCapacity)
 {
     isOpen_ = true;
     level_ = level;
@@ -45,13 +48,19 @@ void Log::init(LogLevel level, const char *path, const char *suffix, int maxQueu
     path_ = path;
     suffix_ = suffix;
     char fileName[LOG_NAME_LEN] = {0};
-    snprintf(fileName, LOG_NAME_LEN - 1, "%s/%04d_%02d_%02d%s",
-             path_, t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, suffix_);
+    snprintf(fileName,
+             LOG_NAME_LEN - 1,
+             "%s/%04d_%02d_%02d%s",
+             path_,
+             t.tm_year + 1900,
+             t.tm_mon + 1,
+             t.tm_mday,
+             suffix_);
     toDay_ = t.tm_mday;
     {
         /* 加锁， 避免多个线程同时操作fp_指针 */
         std::lock_guard<std::mutex> locker(mtx_);
-        buff_.RetriveAll();
+        buff_.RetrieveAll();
         if (fp_)
         {
             /* 唤醒线程 */
@@ -70,34 +79,22 @@ void Log::init(LogLevel level, const char *path, const char *suffix, int maxQueu
     }
 }
 
+/**
+ * @brief 获取日志单例
+ * 
+ * @return Log* 
+ */
 Log *Log::Instance()
 {
     static Log inst;
     return &inst;
 }
 
-// /**
-//  * @brief 获取日志单例
-//  *
-//  * @return Log*
-//  */
-// Log *Log::Instance()
-// {
-//     static std::once_flag initInstanceFlag;
-//     static Log *inst = nullptr;
-//     std::call_once(initInstanceFlag, []()
-//                    { inst = new Log(); });
-//     return inst;
-// }
-
 /**
  * @brief 刷新日志线程
  *
  */
-void Log::FlushLogThread()
-{
-    Log::Instance()->AsyncWrite_();
-}
+void Log::FlushLogThread() { Log::Instance()->AsyncWrite_(); }
 
 /**
  * @brief 写入日志的主要函数
@@ -123,17 +120,29 @@ void Log::write(LogLevel level, const char *format, ...)
 
         char newFile[LOG_NAME_LEN];
         char tail[36] = {0};
-        snprintf(tail, 36, "%04d_%02d_%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday);
+        snprintf(tail,
+                 36,
+                 "%04d_%02d_%02d",
+                 t.tm_year + 1900,
+                 t.tm_mon + 1,
+                 t.tm_mday);
 
         if (toDay_ != t.tm_mday)
         {
-            snprintf(newFile, LOG_NAME_LEN - 72, "%s/%s%s", path_, tail, suffix_);
+            snprintf(
+                newFile, LOG_NAME_LEN - 72, "%s/%s%s", path_, tail, suffix_);
             toDay_ = t.tm_mday;
             lineCount_ = 0;
         }
         else
         {
-            snprintf(newFile, LOG_NAME_LEN - 72, "%s/%s-%d%s", path_, tail, (lineCount_ / MAX_LINES), suffix_);
+            snprintf(newFile,
+                     LOG_NAME_LEN - 72,
+                     "%s/%s-%d%s",
+                     path_,
+                     tail,
+                     (lineCount_ / MAX_LINES),
+                     suffix_);
         }
 
         locker.lock();
@@ -146,15 +155,23 @@ void Log::write(LogLevel level, const char *format, ...)
     {
         std::unique_lock<std::mutex> locker(mtx_);
         lineCount_++;
-        int n = snprintf(buff_.BeginWrite(), 128, "%d-%02d-%02d %02d:%02d:%02d.%06ld ",
-                         t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
-                         t.tm_hour, t.tm_min, t.tm_sec, now.tv_usec);
+        int n = snprintf(buff_.BeginWrite(),
+                         128,
+                         "%d-%02d-%02d %02d:%02d:%02d.%06ld ",
+                         t.tm_year + 1900,
+                         t.tm_mon + 1,
+                         t.tm_mday,
+                         t.tm_hour,
+                         t.tm_min,
+                         t.tm_sec,
+                         now.tv_usec);
 
         buff_.HasWritten(n);
         AppendLogLevelTitle_(level);
 
         va_start(vaList, format);
-        int m = vsnprintf(buff_.BeginWrite(), buff_.WritableBytes(), format, vaList);
+        int m = vsnprintf(
+            buff_.BeginWrite(), buff_.WritableBytes(), format, vaList);
         va_end(vaList);
 
         buff_.HasWritten(m);
@@ -168,7 +185,7 @@ void Log::write(LogLevel level, const char *format, ...)
         {
             fputs(buff_.Peek(), fp_);
         }
-        buff_.RetriveAll();
+        buff_.RetrieveAll();
     }
 }
 

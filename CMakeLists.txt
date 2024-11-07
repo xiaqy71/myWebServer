@@ -11,6 +11,7 @@ set(BUFFER_DIR ${SRC_DIR}/buffer)
 set(LOG_DIR ${SRC_DIR}/log)
 set(CONFIG_DIR ${SRC_DIR}/config)
 set(POOL_DIR ${SRC_DIR}/pool)
+set(HTTP_DIR ${SRC_DIR}/http)
 
 set(SOURCES
     ${SRC_DIR}/main.cpp
@@ -19,9 +20,12 @@ set(SOURCES
     ${LOG_DIR}/log.cpp
     ${CONFIG_DIR}/configMgr.cpp
     ${POOL_DIR}/sqlconnpool.cpp
+    ${HTTP_DIR}/httprequest.cpp
+    ${HTTP_DIR}/httpresponse.cpp
+    ${HTTP_DIR}/httpconn.cpp
 )
 
-include_directories(${TIMER_DIR} ${BUFFER_DIR} ${LOG_DIR} ${CONFIG_DIR} ${POOL_DIR} /usr/include/mysql)
+include_directories(${TIMER_DIR} ${BUFFER_DIR} ${LOG_DIR} ${CONFIG_DIR} ${POOL_DIR} ${HTTP_DIR} /usr/include/mysql)
 link_directories(/usr/lib64/mysql)
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} mysqlclient)

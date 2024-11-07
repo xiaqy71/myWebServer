@@ -4,62 +4,55 @@
  * @brief 缓冲区实现
  * @version 0.1
  * @date 2024-11-05
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #include "buffer.h"
 
 /**
  * @brief Construct a new Buffer:: Buffer object
- * 
+ *
  * @param initBuffSize 初始化缓冲区大小
  */
-Buffer::Buffer(int initBuffSize) : buffer_(initBuffSize), readPos_(0), writePos_(0) {}
+Buffer::Buffer(int initBuffSize)
+: buffer_(initBuffSize)
+, readPos_(0)
+, writePos_(0)
+{
+}
 
 /**
  * @brief 可写大小
- * 
+ *
  * @return size_t 缓冲区可写的字节数
  */
-size_t Buffer::WritableBytes() const
-{
-    return buffer_.size() - writePos_;
-}
+size_t Buffer::WritableBytes() const { return buffer_.size() - writePos_; }
 
 /**
  * @brief 可读大小
- * 
+ *
  * @return size_t 缓冲区可读的字节数
  */
-size_t Buffer::ReadableBytes() const
-{
-    return writePos_ - readPos_;
-}
+size_t Buffer::ReadableBytes() const { return writePos_ - readPos_; }
 
 /**
  * @brief 缓冲区头部大小
- * 
+ *
  * @return size_t 缓冲区头部大小
  */
-size_t Buffer::PrependableBytes() const
-{
-    return readPos_;
-}
+size_t Buffer::PrependableBytes() const { return readPos_; }
 
 /**
  * @brief 获取缓冲区待读数据的起始位置
- * 
+ *
  * @return const char* 缓冲区待读数据的起始位置
  */
-const char *Buffer::Peek() const
-{
-    return BeginPtr_() + readPos_;
-}
+const char *Buffer::Peek() const { return BeginPtr_() + readPos_; }
 
 /**
  * @brief 确保缓冲区有足够的空间
- * 
+ *
  * @param len 需要的空间大小
  */
 void Buffer::EnsureWriteable(size_t len)
@@ -73,17 +66,14 @@ void Buffer::EnsureWriteable(size_t len)
 
 /**
  * @brief 已经写入的数据大小
- * 
+ *
  * @param len 已经写入的数据大小
  */
-void Buffer::HasWritten(size_t len)
-{
-    writePos_ += len;
-}
+void Buffer::HasWritten(size_t len) { writePos_ += len; }
 
 /**
  * @brief 偏移已读数据
- * 
+ *
  * @param len 偏移大小
  */
 void Buffer::Retrieve(size_t len)
@@ -94,7 +84,7 @@ void Buffer::Retrieve(size_t len)
 
 /**
  * @brief 读取数据直到end
- * 
+ *
  * @param end 读取数据直到end
  */
 void Buffer::RetrieveUntil(const char *end)
@@ -105,9 +95,9 @@ void Buffer::RetrieveUntil(const char *end)
 
 /**
  * @brief 将缓冲区中的数据全部视为已读
- * 
+ *
  */
-void Buffer::RetriveAll()
+void Buffer::RetrieveAll()
 {
     // 缓冲区全部置零
     memset(buffer_.data(), 0, buffer_.size());
@@ -117,19 +107,19 @@ void Buffer::RetriveAll()
 
 /**
  * @brief 将缓冲区中的数据全部视为已读，并返回字符串
- * 
+ *
  * @return std::string 缓冲区中的数据
  */
 std::string Buffer::RetrieveAllToStr()
 {
     std::string str(Peek(), ReadableBytes());
-    RetriveAll();
+    RetrieveAll();
     return str;
 }
 
 /**
  * @brief 获取缓冲区待写数据的起始位置
- * 
+ *
  * @return const char* 缓冲区待写数据的起始位置
  */
 const char *Buffer::BeginWriteConst() const
@@ -139,17 +129,14 @@ const char *Buffer::BeginWriteConst() const
 
 /**
  * @brief 获取缓冲区待写数据的起始位置
- * 
+ *
  * @return char* 缓冲区待写数据的起始位置
  */
-char *Buffer::BeginWrite()
-{
-    return BeginPtr_() + writePos_;
-}
+char *Buffer::BeginWrite() { return BeginPtr_() + writePos_; }
 
 /**
  * @brief 追加字符串
- * 
+ *
  * @param str 字符串
  */
 void Buffer::Append(const std::string &str)
@@ -159,7 +146,7 @@ void Buffer::Append(const std::string &str)
 
 /**
  * @brief 追加字符串
- * 
+ *
  * @param str 待追加字符串
  * @param len 待追加字符串长度
  */
@@ -174,7 +161,7 @@ void Buffer::Append(const char *str, size_t len)
 
 /**
  * @brief 追加数据
- * 
+ *
  * @param data 待追加数据
  * @param len 待追加数据长度
  */
@@ -185,7 +172,7 @@ void Buffer::Append(const void *data, size_t len)
 
 /**
  * @brief 追加缓冲区
- * 
+ *
  * @param buff 待追加缓冲区
  */
 void Buffer::Append(const Buffer &buff)
@@ -195,10 +182,10 @@ void Buffer::Append(const Buffer &buff)
 
 /**
  * @brief 从fd中读取数据
- * 
+ *
  * @param fd 文件描述符
  * @param Errno 错误码
- * @return ssize_t 
+ * @return ssize_t
  */
 ssize_t Buffer::ReadFd(int fd, int *Errno)
 {
@@ -231,10 +218,10 @@ ssize_t Buffer::ReadFd(int fd, int *Errno)
 
 /**
  * @brief 将数据写入fd
- * 
+ *
  * @param fd 文件描述符
  * @param Errno 错误码
- * @return ssize_t 
+ * @return ssize_t
  */
 ssize_t Buffer::WriteFd(int fd, int *Errno)
 {
@@ -251,17 +238,14 @@ ssize_t Buffer::WriteFd(int fd, int *Errno)
 
 /**
  * @brief 获取缓冲区起始位置
- * 
+ *
  * @return char* 缓冲区起始位置
  */
-char *Buffer::BeginPtr_()
-{
-    return buffer_.data();
-}
+char *Buffer::BeginPtr_() { return buffer_.data(); }
 
 /**
  * @brief 获取缓冲区起始位置
- * 
+ *
  * @return const char* 缓冲区起始位置
  */
 const char *Buffer::BeginPtr_() const
@@ -271,7 +255,7 @@ const char *Buffer::BeginPtr_() const
 
 /**
  * @brief 重新分配缓冲区大小
- * 
+ *
  * @param len 缓冲区大小
  */
 void Buffer::MakeSpace_(size_t len)

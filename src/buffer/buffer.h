@@ -4,9 +4,9 @@
  * @brief 缓冲区声明
  * @version 0.1
  * @date 2024-11-05
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #if !defined(BUFFER_H)
 #define BUFFER_H
@@ -36,7 +36,7 @@ public:
     void Retrieve(size_t len);
     void RetrieveUntil(const char *end);
 
-    void RetriveAll();
+    void RetrieveAll();
     std::string RetrieveAllToStr();
 
     const char *BeginWriteConst() const;

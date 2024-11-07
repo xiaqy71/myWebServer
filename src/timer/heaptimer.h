@@ -4,9 +4,9 @@
  * @brief 基于小根堆的定时器声明
  * @version 0.1
  * @date 2024-11-05
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #if !defined(HEAP_TIMER_H)
 #define HEAP_TIMER_H
@@ -24,24 +24,24 @@ typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::milliseconds MS;
 typedef Clock::time_point TimeStamp;
 
-struct TimerNode{
+struct TimerNode
+{
     int id;
     TimeStamp expires;
     TimeOutCallBack cb;
-    bool operator<(const TimerNode& t) const{
-        return expires < t.expires;
-    }
+    bool operator<(const TimerNode &t) const { return expires < t.expires; }
 };
 
-class HeapTimer {
+class HeapTimer
+{
 public:
     HeapTimer() { heap_.reserve(64); }
-    
+
     ~HeapTimer() { clear(); }
 
     void adjust(int id, int newExpires);
 
-    void add(int id, int timeOut, const TimeOutCallBack& cb);
+    void add(int id, int timeOut, const TimeOutCallBack &cb);
 
     void doWork(int id);
 

@@ -33,7 +33,8 @@ enum class LogLevel
 class Log
 {
 public:
-    void init(LogLevel level, const char *path = "./log",
+    void init(LogLevel level,
+              const char *path = "./log",
               const char *suffix = ".log",
               int maxQueueCapacity = 1024);
     static Log *Instance();
@@ -73,40 +74,40 @@ private:
 
     FILE *fp_;
     std::unique_ptr<BlockDeque<std::string>> deque_; // 队列存放待写入的日志
-    std::unique_ptr<std::thread> writeThread_;       // 将日志写入文件的线程
-    std::mutex mtx_;                                 // 互斥锁
+    std::unique_ptr<std::thread> writeThread_; // 将日志写入文件的线程
+    std::mutex mtx_;                           // 互斥锁
 };
 
-#define LOG_BASE(level, format, ...)                   \
-    do                                                 \
-    {                                                  \
-        auto log = Log::Instance();                    \
-        if (log->IsOpen() && log->GetLevel() <= level) \
-        {                                              \
-            log->write(level, format, ##__VA_ARGS__);  \
-            log->flush();                              \
-        }                                              \
+#define LOG_BASE(level, format, ...)                                           \
+    do                                                                         \
+    {                                                                          \
+        auto log = Log::Instance();                                            \
+        if (log->IsOpen() && log->GetLevel() <= level)                         \
+        {                                                                      \
+            log->write(level, format, ##__VA_ARGS__);                          \
+            log->flush();                                                      \
+        }                                                                      \
     } while (0);
 
-#define LOG_DEBUG(format, ...)                           \
-    do                                                   \
-    {                                                    \
-        LOG_BASE(LogLevel::DEBUG, format, ##__VA_ARGS__) \
+#define LOG_DEBUG(format, ...)                                                 \
+    do                                                                         \
+    {                                                                          \
+        LOG_BASE(LogLevel::DEBUG, format, ##__VA_ARGS__)                       \
     } while (0);
-#define LOG_INFO(format, ...)                           \
-    do                                                  \
-    {                                                   \
-        LOG_BASE(LogLevel::INFO, format, ##__VA_ARGS__) \
+#define LOG_INFO(format, ...)                                                  \
+    do                                                                         \
+    {                                                                          \
+        LOG_BASE(LogLevel::INFO, format, ##__VA_ARGS__)                        \
     } while (0);
-#define LOG_WARN(format, ...)                           \
-    do                                                  \
-    {                                                   \
-        LOG_BASE(LogLevel::WARN, format, ##__VA_ARGS__) \
+#define LOG_WARN(format, ...)                                                  \
+    do                                                                         \
+    {                                                                          \
+        LOG_BASE(LogLevel::WARN, format, ##__VA_ARGS__)                        \
     } while (0);
-#define LOG_ERROR(format, ...)                           \
-    do                                                   \
-    {                                                    \
-        LOG_BASE(LogLevel::ERROR, format, ##__VA_ARGS__) \
+#define LOG_ERROR(format, ...)                                                 \
+    do                                                                         \
+    {                                                                          \
+        LOG_BASE(LogLevel::ERROR, format, ##__VA_ARGS__)                       \
     } while (0);
 
 #endif // LOG_H
