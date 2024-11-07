@@ -1,4 +1,4 @@
-build/*
+build/
 .clang-format
 format.sh
 .DS_Store
