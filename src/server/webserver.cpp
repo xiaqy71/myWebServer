@@ -48,6 +48,7 @@ WebServer::WebServer(int port,
 , epoller_(new Epoller())
 , threadpool_(new ThreadPool(threadNum))
 {
+    /* 解析resouces目录位置*/
     char exePath[256] = {0};
     ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
     exePath[len] = '\0';
@@ -56,8 +57,10 @@ WebServer::WebServer(int port,
         "/resources/";
     srcDir_ = new char[dirPath.size() + 1];
     memcpy(srcDir_, dirPath.c_str(), dirPath.size() + 1);
+    // 初始化用户数
     HttpConn::userCount = 0;
     HttpConn::srcDir = srcDir_;
+    // 初始化数据库连接池
     SqlConnPool::Instance()->Init(
         "localhost", sqlPort, sqlUser, sqlPwd, dbName, connPoolNum);
 
@@ -312,22 +315,26 @@ bool WebServer::InitSocket_()
  */
 void WebServer::InitEventMode_(int trigMode)
 {
-    listenEvent_ = EPOLLRDHUP;
-    connEvent_ = EPOLLONESHOT | EPOLLRDHUP;
+    listenEvent_ = EPOLLRDHUP; // 被挂断事件
+    connEvent_ = EPOLLONESHOT | EPOLLRDHUP; // 保证多线程下只有一个线程处理一个连接
     switch (trigMode)
     {
     case 0:
         break;
+    // LT + ET
     case 1:
         connEvent_ |= EPOLLET;
         break;
+    // ET + LT
     case 2:
         listenEvent_ |= EPOLLET;
         break;
+    // ET + ET
     case 3:
         listenEvent_ |= EPOLLET;
         connEvent_ |= EPOLLET;
         break;
+    // 默认：ET + ET
     default:
         listenEvent_ |= EPOLLET;
         connEvent_ = EPOLLET;
@@ -352,7 +359,9 @@ void WebServer::AddClient_(int fd, sockaddr_in addr)
                     timeoutMS_,
                     std::bind(&WebServer::CloseConn_, this, &users_[fd]));
     }
+    // 绑定客户端的读事件和触发模式
     epoller_->AddFd(fd, EPOLLIN | connEvent_);
+    // 将文件描述符设置为非阻塞
     SetFdNonblock(fd);
     LOG_INFO("Client[%d] in!", users_[fd].getFd());
 }
@@ -423,6 +432,11 @@ void WebServer::SendError_(int fd, const char *info)
     close(fd);
 }
 
+/**
+ * @brief 延长客户端连接时间
+ * 
+ * @param client 
+ */
 void WebServer::ExtentTime_(HttpConn *client)
 {
     assert(client);
@@ -456,6 +470,7 @@ void WebServer::OnRead_(HttpConn *client)
     int ret = -1;
     int readErrno = 0;
     ret = client->read(&readErrno);
+    // 读失败且错误码不是EAGAIN 说明对端关闭连接
     if (ret <= 0 && readErrno != EAGAIN)
     {
         CloseConn_(client);
@@ -505,14 +520,22 @@ void WebServer::OnProcess(HttpConn *client)
 {
     if (client->process())
     {
+        /* 处理请求成功， 绑定写就绪事件 */
         epoller_->ModFd(client->getFd(), connEvent_ | EPOLLOUT);
     }
     else
     {
+        /* 处理请求失败， 需要继续读取*/
         epoller_->ModFd(client->getFd(), connEvent_ | EPOLLIN);
     }
 }
 
+/**
+ * @brief 设置文件描述符为非阻塞
+ * 
+ * @param fd 
+ * @return int 
+ */
 int WebServer::SetFdNonblock(int fd)
 {
     assert(fd > 0);

@@ -41,6 +41,7 @@ public:
     sockaddr_in getAddr() const;
 
     bool process();
+    /* 要写的字节数 */
     int ToWriteBytes() { return iov_[0].iov_len + iov_[1].iov_len; }
     bool isKeepAlive() const { return request_.IsKeepAlive(); }
 
