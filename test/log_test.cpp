@@ -1,5 +1,5 @@
-#include "log.h"
 #include <gtest/gtest.h>
+#include "log.h"
 
 TEST(LogTest, Init)
 {

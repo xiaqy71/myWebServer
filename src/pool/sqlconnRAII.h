@@ -19,20 +19,21 @@ public:
     SqlConnRAII(MYSQL **sql, SqlConnPool *connPool)
     {
         *sql = connPool->GetConn();
-        sql_ = *sql;
+        sql_ = sql;
         connPool_ = connPool;
     }
 
     ~SqlConnRAII()
     {
-        if (sql_)
+        if (*sql_)
         {
-            connPool_->returnConn(sql_);
+            connPool_->returnConn(*sql_);
+            *sql_ = nullptr;
         }
     }
 
 private:
-    MYSQL *sql_;
+    MYSQL **sql_;
     SqlConnPool *connPool_;
 };
 

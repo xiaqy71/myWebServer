@@ -57,3 +57,13 @@ gtest_discover_tests(log_test)
 add_executable(config_test test/config_test.cpp ${CONFIG_DIR}/configMgr.cpp)
 target_link_libraries(config_test GTest::gtest_main)
 gtest_discover_tests(config_test)
+
+# test thread_pool
+add_executable(thread_pool_test test/thread_pool_test.cpp)
+target_link_libraries(thread_pool_test GTest::gtest_main)
+gtest_discover_tests(thread_pool_test)
+
+#test sqlconnpool
+add_executable(sqlconnpool_test test/sqlconn_pool_test.cpp ${POOL_DIR}/sqlconnpool.cpp ${LOG_DIR}/log.cpp ${BUFFER_DIR}/buffer.cpp)
+target_link_libraries(sqlconnpool_test GTest::gtest_main mysqlclient)
+gtest_discover_tests(sqlconnpool_test)
