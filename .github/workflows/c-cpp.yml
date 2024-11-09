@@ -22,11 +22,10 @@ jobs:
           --health-retries=3
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: testdb
+          MYSQL_DATABASE: testdb  # 数据库名为 testdb
         ports:
           - 3306:3306
-        # 延迟以确保 MySQL 服务完全启动并能够接受连接
-        #options: --health-timeout=5m
+        options: --health-timeout=5m
 
     steps:
     # 检出你的代码
@@ -51,6 +50,15 @@ jobs:
           echo 'MySQL did not start in time' >&2
           exit 1
         fi
+
+    # 创建 user 表
+    - name: Create user table
+      run: |
+        mysql -h 127.0.0.1 -u root -prootpassword -e "USE testdb; \
+        CREATE TABLE IF NOT EXISTS user ( \
+        username CHAR(50) NULL, \
+        password CHAR(50) NULL \
+        ) ENGINE=InnoDB;"
 
     # 执行 CMake 生成
     - name: Build with CMake
