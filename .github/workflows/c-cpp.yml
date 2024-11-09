@@ -59,13 +59,13 @@ jobs:
         fi
 
     # 创建 user 表
-    - name: Create user table
-      run: |
-        sudo mysql -e "USE dbtest; \
-        CREATE TABLE IF NOT EXISTS user ( \
-        username CHAR(50) NULL, \
-        password CHAR(50) NULL \
-        ) ENGINE=InnoDB;"
+    # - name: Create user table
+    #   run: |
+    #     sudo mysql -e "USE dbtest; \
+    #     CREATE TABLE IF NOT EXISTS user ( \
+    #     username CHAR(50) NULL, \
+    #     password CHAR(50) NULL \
+    #     ) ENGINE=InnoDB;"
 
     # 执行 CMake 生成
     - name: Build with CMake
