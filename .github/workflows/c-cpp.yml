@@ -12,22 +12,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:latest
-        options: >-
-          --health-cmd='mysqladmin ping --silent'
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: testdb  # 数据库名为 testdb
-        ports:
-          - 3306:3306
-        #options: --health-timeout=5m
+    # services:
+      # mysql:
+      #   image: mysql:latest
+      #   options: >-
+      #     --health-cmd='mysqladmin ping --silent'
+      #     --health-interval=10s
+      #     --health-timeout=5s
+      #     --health-retries=3
+      #   env:
+      #     MYSQL_ROOT_PASSWORD: rootpassword
+      #     MYSQL_DATABASE: testdb  # 数据库名为 testdb
+      #   ports:
+      #     - 3306:3306
+      #   #options: --health-timeout=5m
 
     steps:
+    # 设置 MySQL
+    - name: Set up MySQL
+      uses: samin/mysql-action@v1
+      with:
+        mysql database: 'dbtest' # Optional, default value is "test". The specified database which will be create
+        mysql root password: rootpassword # Required if "mysql user" is empty, default is empty. The root superuser password
+
     # 检出你的代码
     - name: Checkout code
       uses: actions/checkout@v3
