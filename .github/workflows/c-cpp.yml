@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        options: >-
+          --health-cmd='mysqladmin ping --silent'
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        # 延迟以确保 MySQL 服务完全启动并能够接受连接
+        #options: --health-timeout=5m
+
+    steps:
+    # 检出你的代码
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 安装依赖
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y cmake make g++ libmysqlclient-dev
+
+    # 等待 MySQL 完全初始化
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {30..0}; do
+          if mysqladmin ping -h 127.0.0.1 --silent; then
+            break
+          fi
+          echo 'Waiting for MySQL...'
+          sleep 1
+        done
+        if [ "$i" = 0 ]; then
+          echo 'MySQL did not start in time' >&2
+          exit 1
+        fi
+
+    # 执行 CMake 生成
+    - name: Build with CMake
+      run: |
+        cmake -S . -B build
+        cmake --build build
+
+    # 启动服务器
+    - name: Start Server
+      run: |
+        cd build
+        nohup ./Server &
+
+    # 检查服务器是否正常运行，监听指定端口
+    - name: Check if server is running
+      run: |
+        for i in {30..0}; do
+          if nc -zv 127.0.0.1 8080; then
+            echo "Server is running on port 8080"
+            break
+          fi
+          echo 'Waiting for Server to start...'
+          sleep 1
+        done
+        if [ "$i" = 0 ]; then
+          echo 'Server did not start in time' >&2
+          exit 1
+        fi
