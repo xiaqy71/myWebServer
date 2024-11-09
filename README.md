@@ -77,9 +77,9 @@ threadNum = 6
 
 [mysql]
 port = 3306
-user = xiaqy
-password = 123456
-database = WebServer
+user = root
+password = rootpassword
+database = testdb
 connPoolNum = 12
 
 [log]
