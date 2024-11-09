@@ -61,7 +61,7 @@ jobs:
     # 创建 user 表
     - name: Create user table
       run: |
-        mysql -h 127.0.0.1 -u root -prootpassword -e "USE testdb; \
+        sudo mysql -e "USE dbtest; \
         CREATE TABLE IF NOT EXISTS user ( \
         username CHAR(50) NULL, \
         password CHAR(50) NULL \
